@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
   WasteRecord.init({
     departement_id: DataTypes.INTEGER,
     category_id: DataTypes.INTEGER,
-    weight_kg: DataTypes.FLOAT
+    weight_kg: DataTypes.FLOAT,
+    evidence_photo: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'WasteRecord',

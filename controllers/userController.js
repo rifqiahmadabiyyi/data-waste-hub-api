@@ -1,6 +1,7 @@
 const userService = require('../services/userService');
 const { successResponse, errorResponse } = require('../helpers/responseHelper');
 const { createUserSchema, updateUserSchema } = require('../validators/userValidator');
+const { Departement  } = require('../models');
 const validateRequest = require('../middlewares/validateRequest');
 
 exports.getAllUsers = async (req, res) => {
@@ -17,6 +18,11 @@ exports.createUser = [
   async (req, res) => {
     try {
       const { username, password, departement_id } = req.body;
+
+      // Check if departement exists
+      const departement = await Departement.findByPk(departement_id);
+      if (!departement) return errorResponse(res, 'Invalid departement_id', 4001, {}, 400);
+
       const newUser = await userService.createUser({ username, password, departement_id });
       return successResponse(res, 'User created successfully', newUser, 201);
     } catch (err) {
@@ -43,6 +49,15 @@ exports.updateUser = [
   async (req, res) => {
     try {
       const userId = req.params.id;
+
+      const { departement_id } = req.body;
+
+      // Check if departement exists (only if departement_id is being updated)
+      if (departement_id) {
+        const departement = await Departement.findByPk(departement_id);
+        if (!departement) return errorResponse(res, 'Invalid departement_id', 4001, {}, 400);
+      }
+
       const updated = await userService.updateUser(userId, req.body);
       if (updated === 0) {
         return errorResponse(res, 'User not found', 1005, {}, 404);

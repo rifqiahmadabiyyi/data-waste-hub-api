@@ -18,6 +18,9 @@ module.exports = {
       weight_kg: {
         type: Sequelize.FLOAT
       },
+      evidence_photo: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
