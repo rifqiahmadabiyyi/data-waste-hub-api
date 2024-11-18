@@ -1,4 +1,7 @@
 const { User, Departement } = require('../models');
+const bcrypt = require('bcrypt');
+
+const SALT_ROUNDS = 10;
 
 /**
  * Get all users
@@ -23,7 +26,8 @@ exports.createUser = async (userData) => {
   const departement = await Departement.findByPk(departement_id);
   if (!departement) throw new Error('Invalid departement_id');
 
-  return await User.create(userData);
+  const hashedPassword = await bcrypt.hash(userData.password, SALT_ROUNDS);
+  return await User.create({ ...userData, password: hashedPassword });
 };
 
 /**
@@ -51,6 +55,9 @@ exports.updateUser = async (userId, userData) => {
     if (!departement) throw new Error('Invalid departement_id');
   }
 
+  if (userData.password) {
+    userData.password = await bcrypt.hash(userData.password, SALT_ROUNDS);
+  }
   const updated = await User.update(userData, { where: { id: userId } });
   return updated[0]; // Return number of rows updated
 };

@@ -1,5 +1,7 @@
 const userService = require('../services/userService');
 const { successResponse, errorResponse } = require('../helpers/responseHelper');
+const { createUserSchema, updateUserSchema } = require('../validators/userValidator');
+const validateRequest = require('../middlewares/validateRequest');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -10,15 +12,18 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-exports.createUser = async (req, res) => {
-  try {
-    const { username, password, departement_id } = req.body;
-    const newUser = await userService.createUser({ username, password, departement_id });
-    return successResponse(res, 'User created successfully', newUser, 201);
-  } catch (err) {
-    return errorResponse(res, err.message, 1002, {}, 400);
+exports.createUser = [
+  validateRequest(createUserSchema),
+  async (req, res) => {
+    try {
+      const { username, password, departement_id } = req.body;
+      const newUser = await userService.createUser({ username, password, departement_id });
+      return successResponse(res, 'User created successfully', newUser, 201);
+    } catch (err) {
+      return errorResponse(res, err.message, 1002, {}, 400);
+    }
   }
-};
+];
 
 exports.getUserById = async (req, res) => {
   try {
@@ -33,18 +38,22 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-exports.updateUser = async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const updated = await userService.updateUser(userId, req.body);
-    if (updated === 0) {
-      return errorResponse(res, 'User not found', 1005, {}, 404);
+exports.updateUser = [
+  validateRequest(updateUserSchema),
+  async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const updated = await userService.updateUser(userId, req.body);
+      if (updated === 0) {
+        return errorResponse(res, 'User not found', 1005, {}, 404);
+      }
+      const updatedUser = await userService.getUserById(userId);
+      return successResponse(res, 'User updated successfully', updatedUser);
+    } catch (err) {
+      return errorResponse(res, err.message, 1006, {}, 400);
     }
-    return successResponse(res, 'User updated successfully');
-  } catch (err) {
-    return errorResponse(res, err.message, 1006, {}, 400);
   }
-};
+];
 
 exports.deleteUser = async (req, res) => {
   try {
