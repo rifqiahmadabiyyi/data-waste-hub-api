@@ -18,6 +18,10 @@ module.exports = {
       departement_id: {
         type: Sequelize.INTEGER
       },
+      role: {
+        type: DataTypes.STRING,
+        defaultValue: 'user', // Set default value for role
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

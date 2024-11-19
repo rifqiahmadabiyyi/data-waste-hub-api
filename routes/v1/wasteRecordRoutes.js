@@ -1,14 +1,234 @@
 const express = require('express');
 const wasteRecordController = require('../../controllers/wasteRecordController');
 const upload = require('../../middlewares/upload');
+const { authenticateToken } = require('../../middlewares/auth');
+const { authorizeRole } = require('../../middlewares/role');
 
 const router = express.Router();
 
-router.post('/', upload.single('evidence_photo'), wasteRecordController.createWasteRecord);
+/**
+ * @swagger
+ * /waste-records:
+ *   post:
+ *     summary: Create a new waste record
+ *     tags: [Waste Records]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               departement_id:
+ *                 type: integer
+ *                 description: ID of the department submitting the waste record
+ *                 example: 1
+ *               category_id:
+ *                 type: integer
+ *                 description: ID of the waste category
+ *                 example: 2
+ *               weight_kg:
+ *                 type: number
+ *                 description: Weight of the waste in kilograms
+ *                 format: float
+ *                 example: 12.5
+ *               evidence_photo:
+ *                 type: string
+ *                 format: binary
+ *                 description: Evidence photo of the waste record
+ *     responses:
+ *       201:
+ *         description: Waste record created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Waste record created successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 14
+ *                     departement_id:
+ *                       type: integer
+ *                       example: 2
+ *                     category_id:
+ *                       type: integer
+ *                       example: 2
+ *                     weight_kg:
+ *                       type: number
+ *                       format: float
+ *                       example: 12.5
+ *                     evidence_photo:
+ *                       type: string
+ *                       example: "1731997871728-664110813.jpg"
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-11-19T06:31:11.000Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-11-19T06:31:11.000Z"
+ *                     departement:
+ *                       type: object
+ *                       properties:
+ *                         departement_name:
+ *                           type: string
+ *                           example: "Back Office"
+ *                         departement_description:
+ *                           type: string
+ *                           example: "Handles internal operations."
+ *                     category:
+ *                       type: object
+ *                       properties:
+ *                         category_name:
+ *                           type: string
+ *                           example: "Limbah Pabrik"
+ *                         category_description:
+ *                           type: string
+ *                           example: "Limbah test"
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized
+ */
 
-router.get('/month/:month/year/:year', wasteRecordController.getWasteRecordsByMonth);
+router.post('/', authenticateToken, authorizeRole(['admin', 'user']), upload.single('evidence_photo'), wasteRecordController.createWasteRecord);
 
-// Get waste records by year
-router.get('/year/:year', wasteRecordController.getWasteRecordsByYear);
+/**
+ * @swagger
+ * /waste-records/month/{month}/year/{year}:
+ *   get:
+ *     summary: Retrieve waste records summary by month and year
+ *     tags: [Waste Records]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: month
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 12
+ *         description: Month (1-12)
+ *         example: 10
+ *       - in: path
+ *         name: year
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 2000
+ *         description: Year (e.g., 2024)
+ *         example: 2024
+ *     responses:
+ *       200:
+ *         description: Waste records retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Waste records retrieved successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       departement_id:
+ *                         type: integer
+ *                         description: ID of the department
+ *                         example: 1
+ *                       total_weight:
+ *                         type: number
+ *                         description: Total weight of waste (kg)
+ *                         format: float
+ *                         example: 62.5
+ *                       departement:
+ *                         type: object
+ *                         properties:
+ *                           departement_name:
+ *                             type: string
+ *                             description: Name of the department
+ *                             example: "Front Office"
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: No records found
+ */
+router.get('/month/:month/year/:year', authenticateToken, authorizeRole(['admin', 'user']), wasteRecordController.getWasteRecordsByMonth);
+
+/**
+ * @swagger
+ * /waste-records/year/{year}:
+ *   get:
+ *     summary: Retrieve waste records by year
+ *     tags: [Waste Records]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: year
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Year (e.g., 2024)
+ *         example: 2024
+ *     responses:
+ *       200:
+ *         description: Waste records for the specified year
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Waste records retrieved successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       departement_id:
+ *                         type: integer
+ *                         description: ID of the department
+ *                         example: 1
+ *                       total_weight:
+ *                         type: number
+ *                         description: Total weight of waste (kg)
+ *                         format: float
+ *                         example: 62.5
+ *                       departement:
+ *                         type: object
+ *                         properties:
+ *                           departement_name:
+ *                             type: string
+ *                             description: Name of the department
+ *                             example: "Front Office"
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: No records found
+ */
+router.get('/year/:year', authenticateToken, authorizeRole(['admin', 'user']), wasteRecordController.getWasteRecordsByYear);
 
 module.exports = router;

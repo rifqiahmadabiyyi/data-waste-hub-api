@@ -8,6 +8,7 @@ sequelize.authenticate()
     console.log('Connected to the database.');
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
     });
   })
   .catch((err) => {
