@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       role: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         defaultValue: 'user', // Set default value for role
       },
       createdAt: {
