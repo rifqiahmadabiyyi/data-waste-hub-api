@@ -14,3 +14,19 @@ exports.createWasteRecordSchema = Joi.object({
     'any.required': 'weight_kg is required',
   }),
 });
+
+exports.createMultipleWasteRecordsSchema = Joi.object({
+  records: Joi.string() // records harus dalam format JSON string
+    .required()
+    .custom((value, helper) => {
+      try {
+        const parsed = JSON.parse(value);
+        if (!Array.isArray(parsed)) {
+          return helper.message('records must be an array of objects');
+        }
+        return parsed;
+      } catch {
+        return helper.message('Invalid JSON format for records');
+      }
+    }),
+});

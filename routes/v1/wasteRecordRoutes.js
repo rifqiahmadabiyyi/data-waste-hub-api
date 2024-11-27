@@ -102,8 +102,100 @@ const router = express.Router();
  *       401:
  *         description: Unauthorized
  */
-
 router.post('/', authenticateToken, authorizeRole(['admin', 'user']), upload.single('evidence_photo'), wasteRecordController.createWasteRecord);
+
+/**
+ * @swagger
+ * /waste-records/bulk:
+ *   post:
+ *     summary: Create a new waste record (bulk)
+ *     tags: [Waste Records]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               records:
+ *                 type: array
+ *                 description: Multiple Records of waste records
+ *                 example: [{ "departement_id": 1, "category_id": 2, "weight_kg": 15.5 }, { "departement_id": 1, "category_id": 4, "weight_kg": 20.0 }]
+ *               evidence_photos:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Evidence photos of the waste record by index
+ *     responses:
+ *       201:
+ *         description: Waste records created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Waste records created successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 54
+ *                       departement_id:
+ *                         type: integer
+ *                         example: 1
+ *                       category_id:
+ *                         type: integer
+ *                         example: 4
+ *                       weight_kg:
+ *                         type: number
+ *                         format: float
+ *                         example: 20.0
+ *                       evidence_photo:
+ *                         type: string
+ *                         example: "1732734319474-188711958.jpg"
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-11-27T19:05:19.000Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-11-27T19:05:19.000Z"
+ *                       departement:
+ *                         type: object
+ *                         properties:
+ *                           departement_name:
+ *                             type: string
+ *                             example: "Front Office"
+ *                           departement_description:
+ *                             type: string
+ *                             example: "Front Office"
+ *                       category:
+ *                         type: object
+ *                         properties:
+ *                           category_name:
+ *                             type: string
+ *                             example: "Plastic"
+ *                           category_description:
+ *                             type: string
+ *                             example: "Recyclable plastic waste."
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/bulk', authenticateToken, authorizeRole(['admin', 'user']), upload.fields([{ name: 'evidence_photos', maxCount: 10 }]), wasteRecordController.createMultipleWasteRecords);
 
 /**
  * @swagger

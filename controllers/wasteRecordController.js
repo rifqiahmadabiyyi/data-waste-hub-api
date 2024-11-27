@@ -1,6 +1,7 @@
 const { successResponse, errorResponse } = require('../helpers/responseHelper');
 const wasteRecordService = require('../services/wasteRecordService');
 const { createWasteRecordSchema } = require('../validators/wasteRecordValidator');
+const { createMultipleWasteRecordsSchema  } = require('../validators/wasteRecordValidator');
 const { Departement, WasteCategory  } = require('../models');
 const validateRequest = require('../middlewares/validateRequest');
 const multer = require('multer');
@@ -69,3 +70,67 @@ exports.createWasteRecord = [
       return errorResponse(res, err.message, 1015);
     }
   }
+
+  exports.createMultipleWasteRecords = [
+    validateRequest(createMultipleWasteRecordsSchema),
+    async (req, res) => {
+      try {
+        const parsedRecords = JSON.parse(req.body.records);
+    
+        // Validasi apakah file diunggah
+        const files = req.files.evidence_photos || []; // Ambil file, jika ada
+        const createdRecords = []; // Menyimpan records yang berhasil dibuat
+    
+        for (let i = 0; i < parsedRecords.length; i++) {
+          const record = parsedRecords[i];
+    
+          // Validasi departement_id
+          const departement = await Departement.findByPk(record.departement_id);
+          if (!departement) {
+            return errorResponse(
+              res,
+              `Invalid departement_id for record at index ${i}`,
+              4001,
+              { index: i },
+              400
+            );
+          }
+    
+          // Validasi category_id
+          const category = await WasteCategory.findByPk(record.category_id);
+          if (!category) {
+            return errorResponse(
+              res,
+              `Invalid category_id for record at index ${i}`,
+              4002,
+              { index: i },
+              400
+            );
+          }
+    
+          // Cek apakah ada file yang diunggah untuk record ini berdasarkan index
+          const file = files[i] || null; // Jika tidak ada file, set ke null
+    
+          // Buat record baru, gunakan null jika file tidak ada
+          const newRecord = await wasteRecordService.createSingleRecord({
+            departement_id: record.departement_id,
+            category_id: record.category_id,
+            weight_kg: record.weight_kg,
+            evidence_photo: file ? file.filename : null, // Jika file ada, gunakan namanya, jika tidak, set ke null
+          });
+    
+          createdRecords.push(newRecord);
+        }
+    
+        return successResponse(res, 'Waste records created successfully', createdRecords, 201);
+      } catch (err) {
+        if (err instanceof multer.MulterError) {
+          return errorResponse(res, err.message, 1013, {}, 400);
+        }
+        return errorResponse(res, err.message, 1014, {}, 500);
+      }
+    },
+  ];
+  
+  
+  
