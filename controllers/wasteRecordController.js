@@ -59,3 +59,13 @@ exports.createWasteRecord = [
       return errorResponse(res, err.message, 1016);
     }
   };
+
+  exports.getWasteRecordsByDay = async (req, res) => {
+    try {
+      const { day, month, year } = req.params;
+      const records = await wasteRecordService.getWasteRecordsByDay(day, month, year);
+      return successResponse(res, 'Waste records retrieved successfully', records);
+    } catch (err) {
+      return errorResponse(res, err.message, 1015);
+    }
+  }

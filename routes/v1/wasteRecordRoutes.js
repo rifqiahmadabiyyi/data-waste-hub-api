@@ -166,6 +166,29 @@ router.post('/', authenticateToken, authorizeRole(['admin', 'user']), upload.sin
  *                             type: string
  *                             description: Name of the department
  *                             example: "Front Office"
+ *                       categories:
+ *                         type: array
+ *                         description: List of waste categories
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             category_id:
+ *                               type: integer
+ *                               description: ID of the waste category
+ *                               example: 2
+ *                             total_weight:
+ *                               type: number
+ *                               description: Total weight of this category (kg)
+ *                               format: float
+ *                               example: 12.5
+ *                             category:
+ *                               type: object
+ *                               description: Details of the waste category
+ *                               properties:
+ *                                 category_name:
+ *                                   type: string
+ *                                   description: Name of the category
+ *                                   example: "Limbah Pabrik"
  *       401:
  *         description: Unauthorized
  *       404:
@@ -224,11 +247,134 @@ router.get('/month/:month/year/:year', authenticateToken, authorizeRole(['admin'
  *                             type: string
  *                             description: Name of the department
  *                             example: "Front Office"
+ *                       categories:
+ *                         type: array
+ *                         description: List of waste categories
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             category_id:
+ *                               type: integer
+ *                               description: ID of the waste category
+ *                               example: 2
+ *                             total_weight:
+ *                               type: number
+ *                               description: Total weight of this category (kg)
+ *                               format: float
+ *                               example: 12.5
+ *                             category:
+ *                               type: object
+ *                               description: Details of the waste category
+ *                               properties:
+ *                                 category_name:
+ *                                   type: string
+ *                                   description: Name of the category
+ *                                   example: "Limbah Pabrik"
  *       401:
  *         description: Unauthorized
  *       404:
  *         description: No records found
  */
 router.get('/year/:year', authenticateToken, authorizeRole(['admin', 'user']), wasteRecordController.getWasteRecordsByYear);
+
+/**
+ * @swagger
+ * /waste-records/day/{day}/month/{month}/year/{year}:
+ *   get:
+ *     summary: Retrieve waste records summary by day month and year
+ *     tags: [Waste Records]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: day
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 31
+ *         description: Day (1-31)
+ *         example: 24
+ *       - in: path
+ *         name: month
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 12
+ *         description: Month (1-12)
+ *         example: 10
+ *       - in: path
+ *         name: year
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 2000
+ *         description: Year (e.g., 2024)
+ *         example: 2024
+ *     responses:
+ *       200:
+ *         description: Waste records retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Waste records retrieved successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       departement_id:
+ *                         type: integer
+ *                         description: ID of the department
+ *                         example: 1
+ *                       total_weight:
+ *                         type: number
+ *                         description: Total weight of waste (kg)
+ *                         format: float
+ *                         example: 62.5
+ *                       departement:
+ *                         type: object
+ *                         properties:
+ *                           departement_name:
+ *                             type: string
+ *                             description: Name of the department
+ *                             example: "Front Office"
+ *                       categories:
+ *                         type: array
+ *                         description: List of waste categories
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             category_id:
+ *                               type: integer
+ *                               description: ID of the waste category
+ *                               example: 2
+ *                             total_weight:
+ *                               type: number
+ *                               description: Total weight of this category (kg)
+ *                               format: float
+ *                               example: 12.5
+ *                             category:
+ *                               type: object
+ *                               description: Details of the waste category
+ *                               properties:
+ *                                 category_name:
+ *                                   type: string
+ *                                   description: Name of the category
+ *                                   example: "Limbah Pabrik"
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: No records found
+ */
+router.get('/day/:day/month/:month/year/:year', authenticateToken, authorizeRole(['admin', 'user']), wasteRecordController.getWasteRecordsByDay);
 
 module.exports = router;
