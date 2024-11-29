@@ -131,6 +131,38 @@ exports.createWasteRecord = [
       }
     },
   ];
+
+  // Records by Departement
+  exports.getWasteRecordsPerMonthByDepartement = async (req, res) => {
+    try {
+      const { departement_id, month, year } = req.params;
+      const records = await wasteRecordService.getWasteRecordsPerMonthByDepartement(departement_id, month, year);
+      return successResponse(res, 'Waste records retrieved successfully', records);
+    } catch (err) {
+      return errorResponse(res, err.message, 1016);
+    }
+  };
+
+  exports.getWasteRecordsPerYearByDepartement = async (req, res) => {
+    try {
+      const { departement_id, year } = req.params;
+      const records = await wasteRecordService.getWasteRecordsPerYearByDepartement(departement_id, year);
+      return successResponse(res, 'Waste records retrieved successfully', records);
+    } catch (err) {
+      return errorResponse(res, err.message, 1016);
+    }
+  };
+
+  exports.getWasteRecordsPerDayByDepartement = async (req, res) => {
+    try {
+      const { departement_id, day, month, year } = req.params;
+      const records = await wasteRecordService.getWasteRecordsPerDayByDepartement(departement_id, day, month, year);
+      return successResponse(res, 'Waste records retrieved successfully', records);
+    } catch (err) {
+      return errorResponse(res, err.message, 1015);
+    }
+  }
+  
   
   
   

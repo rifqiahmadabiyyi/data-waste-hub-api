@@ -185,3 +185,165 @@ exports.getWasteRecordsByDay = async (day, month, year) => {
 
   return Object.values(groupedData);
 };
+
+exports.getWasteRecordsPerMonthByDepartement = async (departementId, month, year) => {
+  const rawRecords = await WasteRecord.findAll({
+    attributes: [
+      'departement_id',
+      'category_id',
+      [Sequelize.fn('SUM', Sequelize.col('WasteRecord.weight_kg')), 'weight_kg'],
+    ],
+    where: {
+      [Op.and]: [
+        { departement_id: departementId },
+        Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('WasteRecord.createdAt')), month),
+        Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('WasteRecord.createdAt')), year),
+      ],
+    },
+    include: [
+      {
+        model: Departement,
+        as: 'departement',
+        attributes: ['departement_name'],
+      },
+      {
+        model: WasteCategory,
+        as: 'category',
+        attributes: ['category_name'],
+      },
+    ],
+    group: ['departement_id', 'category_id', 'departement.id', 'category.id'],
+  });
+
+  const groupedData = {};
+
+  rawRecords.forEach(record => {
+    const departementId = record.departement_id;
+    if (!groupedData[departementId]) {
+      groupedData[departementId] = {
+        departement_id: departementId,
+        total_weight: 0,
+        departement: record.departement,
+        categories: []
+      };
+    }
+
+    groupedData[departementId].total_weight += parseFloat(record.weight_kg);
+
+    groupedData[departementId].categories.push({
+      category_id: record.category_id,
+      total_weight: parseFloat(record.weight_kg),
+      category: record.category,
+    });
+  });
+
+  return Object.values(groupedData);
+};
+
+exports.getWasteRecordsPerYearByDepartement = async (departementId, year) => {
+  const rawRecords = await WasteRecord.findAll({
+    attributes: [
+      'departement_id',
+      'category_id',
+      [Sequelize.fn('SUM', Sequelize.col('WasteRecord.weight_kg')), 'weight_kg'],
+    ],
+    where: {
+      [Op.and]: [
+        { departement_id: departementId },
+        Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('WasteRecord.createdAt')), year),
+      ],
+    },
+    include: [
+      {
+        model: Departement,
+        as: 'departement',
+        attributes: ['departement_name'],
+      },
+      {
+        model: WasteCategory,
+        as: 'category',
+        attributes: ['category_name'],
+      },
+    ],
+    group: ['departement_id', 'category_id', 'departement.id', 'category.id'],
+  });
+
+  const groupedData = {};
+
+  rawRecords.forEach(record => {
+    const departementId = record.departement_id;
+    if (!groupedData[departementId]) {
+      groupedData[departementId] = {
+        departement_id: departementId,
+        total_weight: 0,
+        departement: record.departement,
+        categories: []
+      };
+    }
+
+    groupedData[departementId].total_weight += parseFloat(record.weight_kg);
+
+    groupedData[departementId].categories.push({
+      category_id: record.category_id,
+      total_weight: parseFloat(record.weight_kg),
+      category: record.category,
+    });
+  });
+
+  return Object.values(groupedData);
+};
+
+exports.getWasteRecordsPerDayByDepartement = async (departementId, day, month, year) => {
+  const rawRecords = await WasteRecord.findAll({
+    attributes: [
+      'departement_id',
+      'category_id',
+      [Sequelize.fn('SUM', Sequelize.col('WasteRecord.weight_kg')), 'weight_kg'],
+    ],
+    where: {
+      [Op.and]: [
+        { departement_id: departementId },
+        Sequelize.where(Sequelize.fn('DAY', Sequelize.col('WasteRecord.createdAt')), day),
+        Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('WasteRecord.createdAt')), month),
+        Sequelize.where(Sequelize.fn('YEAR', Sequelize.col('WasteRecord.createdAt')), year)
+      ],
+    },
+    include: [
+      {
+        model: Departement,
+        as: 'departement',
+        attributes: ['departement_name'],
+      },
+      {
+        model: WasteCategory,
+        as: 'category',
+        attributes: ['category_name'],
+      },
+    ],
+    group: ['departement_id', 'category_id', 'departement.id', 'category.id'],
+  });
+
+  const groupedData = {};
+
+  rawRecords.forEach(record => {
+    const departementId = record.departement_id;
+    if (!groupedData[departementId]) {
+      groupedData[departementId] = {
+        departement_id: departementId,
+        total_weight: 0,
+        departement: record.departement,
+        categories: []
+      };
+    }
+
+    groupedData[departementId].total_weight += parseFloat(record.weight_kg);
+
+    groupedData[departementId].categories.push({
+      category_id: record.category_id,
+      total_weight: parseFloat(record.weight_kg),
+      category: record.category,
+    });
+  });
+
+  return Object.values(groupedData);
+};
