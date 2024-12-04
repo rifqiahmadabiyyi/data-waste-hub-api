@@ -69,8 +69,10 @@ router.post('/auth/register', register);
  *             properties:
  *               username:
  *                 type: string
+ *                 example: Kineb
  *               password:
  *                 type: string
+ *                 example: 123456
  *     responses:
  *       200:
  *         description: Successful login
@@ -79,10 +81,37 @@ router.post('/auth/register', register);
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
  *                   type: string
+ *                   example: Login successful
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMzMyMzQ0MSwiZXhwIjoxNzMzMzMwNjQxfQ.hDhPV9tZ1_naJyZnESCVqSWMyWELZn3Ki4DXSi3ho3g"
+ *                     username:
+ *                       type: string
+ *                       example: Kineb
+ *                     departement_id:
+ *                       type: integer
+ *                       example: 1
  *       401:
  *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid credentials
  */
 router.post('/auth/login', login);
 

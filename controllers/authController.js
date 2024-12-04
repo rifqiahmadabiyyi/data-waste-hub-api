@@ -28,28 +28,72 @@ exports.register = [
     }
 ];
 
+// exports.login = [ 
+//     validateRequest(loginSchema),
+//     async (req, res) => {
+//     const { username, password } = req.body;
+  
+//     if (!username || !password) {
+//       return errorResponse(res, 'Username and password are required', 4001, {}, 400);
+//     }
+  
+//     const user = await User.scope('withPassword').findOne({ where: { username } });
+  
+//     if (!user) {
+//       return errorResponse(res, 'User not found', 1003, {}, 404);
+//     }
+  
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
+//     if (!isPasswordValid) {
+//       return errorResponse(res, 'Incorrect password', 4001, {}, 401)
+//     }
+  
+//     const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, { expiresIn: '2h' });
+
+//     return successResponse(res, 'Login successful', token, 200);
+//   }
+// ];
+
 exports.login = [ 
-    validateRequest(loginSchema),
-    async (req, res) => {
+  validateRequest(loginSchema),
+  async (req, res) => {
     const { username, password } = req.body;
   
     if (!username || !password) {
       return errorResponse(res, 'Username and password are required', 4001, {}, 400);
     }
   
-    const user = await User.scope('withPassword').findOne({ where: { username } });
+    // Cari user dengan username yang diberikan
+    const user = await User.scope('withPassword').findOne({
+      where: { username },
+      include: [
+        {
+          model: Departement,
+          as: 'departement',
+          attributes: ['id'], // Ambil hanya departement_id
+        },
+      ],
+    });
   
     if (!user) {
       return errorResponse(res, 'User not found', 1003, {}, 404);
     }
   
+    // Validasi password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return errorResponse(res, 'Incorrect password', 4001, {}, 401)
+      return errorResponse(res, 'Incorrect password', 4001, {}, 401);
     }
   
+    // Generate JWT token
     const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, { expiresIn: '2h' });
 
-    return successResponse(res, 'Login successful', token, 200);
-  }
+    // Kirim response dengan username dan departement_id
+    return successResponse(res, 'Login successful', {
+      token: token,
+      username: user.username,
+      departement_id: user.departement?.id || null,
+    }, 200);
+  },
 ];
+

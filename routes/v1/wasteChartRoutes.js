@@ -173,4 +173,194 @@ router.get('/month/:month/year/:year/type/:type', authenticateToken, authorizeRo
  */
 router.get('/day/:day/month/:month/year/:year/type/:type', authenticateToken, authorizeRole(['admin', 'user']), wasteChartController.getWasteRecordsByDay);
 
+
+/**
+ * @swagger
+ * /waste-charts/departement/{departement_id}/year/{year}/type/{type}:
+ *   get:
+ *     summary: Retrieve waste charts by year and type
+ *     tags: [Waste Charts]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: departement_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 2
+ *         description: The ID of the departements
+ *       - in: path
+ *         name: year
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 2024
+ *         description: The year for which to retrieve waste charts
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "pie"
+ *         description: The type of chart
+ *     responses:
+ *       200:
+ *         description: Waste charts retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Waste charts retrieved successfully"
+ *                 data:
+ *                   type: string
+ *                   example: "http://127.0.0.1:8000/visualize-departement-pie-chart/?year=2024"
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/departement/:departement_id/year/:year/type/:type', authenticateToken, authorizeRole(['admin', 'user']), wasteChartController.getWasteRecordsByDepartementPerYear);
+
+/**
+ * @swagger
+ * /waste-charts/departement/{departement_id}/month/{month}/year/{year}/type/{type}:
+ *   get:
+ *     summary: Retrieve waste charts by year and type
+ *     tags: [Waste Charts]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: departement_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 2
+ *         description: The ID of the departements
+ *       - in: path
+ *         name: month
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 12
+ *         description: Month (1-12)
+ *         example: 10
+ *       - in: path
+ *         name: year
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 2024
+ *         description: The year for which to retrieve waste charts
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "pie"
+ *         description: The type of chart
+ *     responses:
+ *       200:
+ *         description: Waste charts retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Waste charts retrieved successfully"
+ *                 data:
+ *                   type: string
+ *                   example: "http://127.0.0.1:8000/visualize-departement-pie-chart/?year=2024"
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/departement/:departement_id/month/:month/year/:year/type/:type', authenticateToken, authorizeRole(['admin', 'user']), wasteChartController.getWasteRecordsByDepartementPerMonth);
+
+/**
+ * @swagger
+ * /waste-charts/departement/{departement_id}/day/{day}/month/{month}/year/{year}/type/{type}:
+ *   get:
+ *     summary: Retrieve waste charts by year and type
+ *     tags: [Waste Charts]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: departement_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 2
+ *         description: The ID of the departements
+ *       - in: path
+ *         name: day
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 31
+ *         description: Day (1-31)
+ *         example: 24
+ *       - in: path
+ *         name: month
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 12
+ *         description: Month (1-12)
+ *         example: 10
+ *       - in: path
+ *         name: year
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 2024
+ *         description: The year for which to retrieve waste charts
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "pie"
+ *         description: The type of chart
+ *     responses:
+ *       200:
+ *         description: Waste charts retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Waste charts retrieved successfully"
+ *                 data:
+ *                   type: string
+ *                   example: "http://127.0.0.1:8000/visualize-departement-pie-chart/?year=2024"
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/departement/:departement_id/day/:day/month/:month/year/:year/type/:type', authenticateToken, authorizeRole(['admin', 'user']), wasteChartController.getWasteRecordsByDepartementPerDay);
+
 module.exports = router;
