@@ -1,6 +1,6 @@
 const express = require('express');
 const wasteRecordController = require('../../controllers/wasteRecordController');
-const upload = require('../../middlewares/upload');
+const { upload } = require('../../middlewares/uploadGCP');
 const { authenticateToken } = require('../../middlewares/auth');
 const { authorizeRole } = require('../../middlewares/role');
 

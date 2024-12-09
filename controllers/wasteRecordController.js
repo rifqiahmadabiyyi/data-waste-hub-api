@@ -4,6 +4,7 @@ const { createWasteRecordSchema } = require('../validators/wasteRecordValidator'
 const { createMultipleWasteRecordsSchema  } = require('../validators/wasteRecordValidator');
 const { Departement, WasteCategory  } = require('../models');
 const validateRequest = require('../middlewares/validateRequest');
+const {uploadToGCS} = require('../middlewares/uploadGCP');
 const multer = require('multer');
 
 exports.createWasteRecord = [
@@ -14,6 +15,8 @@ exports.createWasteRecord = [
         if (!req.file) {
           return errorResponse(res, 'No file uploaded or invalid file type', 1012, {}, 400);
         }
+
+        const evidencePhotoUrl = await uploadToGCS(req.file);
         
         const { departement_id, category_id, weight_kg } = req.body;
 
@@ -27,7 +30,7 @@ exports.createWasteRecord = [
           departement_id,
           category_id,
           weight_kg,
-          evidence_photo: req.file.filename,
+          evidence_photo: evidencePhotoUrl,
         });
   
         return successResponse(res, 'Waste record created successfully', newRecord, 201);
@@ -110,13 +113,29 @@ exports.createWasteRecord = [
     
           // Cek apakah ada file yang diunggah untuk record ini berdasarkan index
           const file = files[i] || null; // Jika tidak ada file, set ke null
+          let uploadedUrl = null;
+
+          if (file) {
+            try {
+              // Upload file ke Google Cloud Storage
+              uploadedUrl = await uploadToGCS(file);
+            } catch (uploadError) {
+              return errorResponse(
+                res,
+                `Failed to upload file for record at index ${i}: ${uploadError.message}`,
+                4003,
+                { index: i },
+                500
+              );
+            }
+          }
     
           // Buat record baru, gunakan null jika file tidak ada
           const newRecord = await wasteRecordService.createSingleRecord({
             departement_id: record.departement_id,
             category_id: record.category_id,
             weight_kg: record.weight_kg,
-            evidence_photo: file ? file.filename : null, // Jika file ada, gunakan namanya, jika tidak, set ke null
+            evidence_photo: uploadedUrl ? uploadedUrl : null,
           });
     
           createdRecords.push(newRecord);
