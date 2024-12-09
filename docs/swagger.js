@@ -10,7 +10,7 @@ const options = {
       description: 'API documentation using Swagger and JWT',
     },
     servers: [
-        { url: 'http://localhost:3000/api/v1/' }
+        { url: 'https://data-waste-hub-api-688382515205.asia-southeast2.run.app/api/v1/' }
     ],
     components: {
       securitySchemes: {
