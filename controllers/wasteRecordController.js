@@ -181,6 +181,34 @@ exports.createWasteRecord = [
       return errorResponse(res, err.message, 1015);
     }
   }
+
+
+  exports.getWasteRecordsByDepartement = async (req, res) => {
+    try {
+      const { departement_id } = req.params;
+
+      const departement = await Departement.findByPk(departement_id);
+      if (!departement) return errorResponse(res, 'Invalid departement_id', 4001, {}, 400);
+      
+      const records = await wasteRecordService.getWasteRecordsByDepartement(departement_id);
+      return successResponse(res, 'Waste records retrieved successfully', records);
+    } catch (err) {
+      return errorResponse(res, err.message, 1016);
+    }
+  };
+
+  exports.getWasteRecordsById = async (req, res) => {
+    try {
+      const recordId = req.params.id;
+      const record = await wasteRecordService.getWasteRecordsById(recordId);
+      if (!record) {
+        return errorResponse(res, 'Waste Record not found', 1003, {}, 404);
+      }
+      return successResponse(res, 'Waste Record retrieved successfully', record);
+    } catch (err) {
+      return errorResponse(res, err.message, 1004);
+    }
+  }
   
   
   

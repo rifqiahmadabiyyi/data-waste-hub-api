@@ -347,3 +347,27 @@ exports.getWasteRecordsPerDayByDepartement = async (departementId, day, month, y
 
   return Object.values(groupedData);
 };
+
+
+exports.getWasteRecordsByDepartement = async (departementId) => {
+  return await WasteRecord.findAll({
+    where: {
+      departement_id: departementId, // Filter berdasarkan departementId
+    },
+    include: {
+      model: Departement,
+      as: 'departement',
+      attributes: ['departement_name', 'departement_description'],
+    },
+  });
+};
+
+exports.getWasteRecordsById = async (recordId) => {
+  return await WasteRecord.findByPk(recordId, {
+    include: {
+      model: Departement,
+      as: 'departement',
+      attributes: ['departement_name', 'departement_description'],
+    },
+  });
+};

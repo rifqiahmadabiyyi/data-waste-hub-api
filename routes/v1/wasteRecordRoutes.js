@@ -763,5 +763,169 @@ router.get('/departement/:departement_id/year/:year', authenticateToken, authori
  */
 router.get('/departement/:departement_id/day/:day/month/:month/year/:year', authenticateToken, authorizeRole(['admin', 'user']), wasteRecordController.getWasteRecordsPerDayByDepartement);
 
+/**
+ * @swagger
+ * /waste-records/departement/{departement_id}:
+ *   get:
+ *     summary: Retrieve waste records by department ID
+ *     tags: [Waste Records]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: departement_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the department to retrieve waste records for
+ *     responses:
+ *       200:
+ *         description: Waste records retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Waste records retrieved successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 58
+ *                       departement_id:
+ *                         type: integer
+ *                         example: 2
+ *                       category_id:
+ *                         type: integer
+ *                         example: 2
+ *                       weight_kg:
+ *                         type: number
+ *                         format: float
+ *                         example: 14
+ *                       evidence_photo:
+ *                         type: string
+ *                         example: "1733719741915-396147758.jpg"
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-12-09T04:49:01.000Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-12-09T04:49:01.000Z"
+ *                       departement:
+ *                         type: object
+ *                         properties:
+ *                           departement_name:
+ *                             type: string
+ *                             example: "Back Office"
+ *                           departement_description:
+ *                             type: string
+ *                             example: "Handles internal operations."
+ *       404:
+ *         description: Department not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Department not found
+ */
+router.get('/departement/:departement_id', authenticateToken, authorizeRole(['admin', 'user']), wasteRecordController.getWasteRecordsByDepartement);
+
+/**
+ * @swagger
+ * /waste-records/{id}:
+ *   get:
+ *     summary: Retrieve a waste record by its ID
+ *     tags: [Waste Records]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the waste record to retrieve
+ *     responses:
+ *       200:
+ *         description: Waste record retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Waste Record retrieved successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 85
+ *                     departement_id:
+ *                       type: integer
+ *                       example: 1
+ *                     category_id:
+ *                       type: integer
+ *                       example: 4
+ *                     weight_kg:
+ *                       type: number
+ *                       format: float
+ *                       example: 20
+ *                     evidence_photo:
+ *                       type: string
+ *                       example: "https://storage.googleapis.com/data-waste-hub-bucket/d03d8378-9f7a-4bf7-8a67-f35f98b448f9.jpg"
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-12-09T12:05:58.000Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-12-09T12:05:58.000Z"
+ *                     departement:
+ *                       type: object
+ *                       properties:
+ *                         departement_name:
+ *                           type: string
+ *                           example: "Front Office"
+ *                         departement_description:
+ *                           type: string
+ *                           example: "Front Office"
+ *       404:
+ *         description: Waste record not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Waste record not found
+ */
+router.get('/:id', authenticateToken, authorizeRole(['admin', 'user']), wasteRecordController.getWasteRecordsById);
+
 
 module.exports = router;
